@@ -1,5 +1,6 @@
 const puzzleContainer = document.getElementById('puzzleContainer');
-const imageSrc = 'file1.png'; // Replace with your image file path
+const imageSrc = document.createElement('img');
+img.src = 'https://www.fcbarcelona.com/fcbarcelona/photo/2022/11/18/ceae25ad-716b-4c57-b22d-688c8712005a/mini_SPAIN-BALDE-IN.png';
 const numRows = 4; // Number of rows in the puzzle
 const numCols = 4; // Number of columns in the puzzle
 
