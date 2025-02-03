@@ -127,6 +127,6 @@ body {
 
 .cover {
   background: radial-gradient(circle farthest-corner at 80% 20%, hsl(150 80% 20% / .3) 0%, hsl(170 60% 10% / .1) 100%),
-    hsl(231, 32%, 29%) url("https://cdnb.artstation.com/p/assets/images/images/057/093/299/large/envar-studio-valorant-raze-s-workshop-final-20221206-1.jpg?1670825371") 50% / cover;
+    hsl(231, 32%, 29%) url("file2.png") 50% / cover;
   color: hsl(200 30% 98%);
 }
