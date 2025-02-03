@@ -1,96 +1,107 @@
-const puzzleImage = 'file1.png'; // Path to your puzzle image
-const rows = 3; // Number of rows in the puzzle grid
-const cols = 3; // Number of columns in the puzzle grid
-const puzzleBoard = document.getElementById('puzzle-board');
-let pieces = [];
-let solved = 0;
+const puzzleContainer = document.getElementById('puzzleContainer');
+const imageSrc = 'file1.png'; // Replace with your image file path
 
-// Create puzzle pieces
-function createPuzzlePieces() {
-    for (let row = 0; row < rows; row++) {
-        for (let col = 0; col < cols; col++) {
+const puzzleSize = 4; // 4x4 puzzle, adjust as needed
+
+let pieces = [];
+
+// Function to create puzzle pieces from the image
+function createPuzzle() {
+    pieces = [];
+    puzzleContainer.innerHTML = ''; // Clear the puzzle container
+
+    for (let row = 0; row < puzzleSize; row++) {
+        for (let col = 0; col < puzzleSize; col++) {
             const piece = document.createElement('div');
-            piece.classList.add('puzzle-piece');
-            piece.setAttribute('draggable', true);
+            piece.classList.add('piece');
+
+            // Set the background image for the piece (cut it into smaller pieces)
+            piece.style.backgroundImage = `url(${imageSrc})`;
+            piece.style.backgroundPosition = `-${col * 100}px -${row * 100}px`; // Position the background image for each piece
             piece.setAttribute('data-row', row);
             piece.setAttribute('data-col', col);
-            piece.style.backgroundImage = `url(${puzzleImage})`;
-            piece.style.backgroundPosition = `-${col * 100}px -${row * 100}px`;
+
+            // Make each piece draggable
+            piece.setAttribute('draggable', true);
             piece.addEventListener('dragstart', handleDragStart);
             piece.addEventListener('dragover', handleDragOver);
             piece.addEventListener('drop', handleDrop);
+            piece.addEventListener('dragenter', handleDragEnter);
+            piece.addEventListener('dragleave', handleDragLeave);
+
+            puzzleContainer.appendChild(piece);
             pieces.push(piece);
-            puzzleBoard.appendChild(piece);
         }
     }
+
+    // Shuffle the pieces by randomizing their position in the container
+    shufflePieces();
 }
 
 // Shuffle the puzzle pieces
-function shufflePuzzle() {
-    const shuffledPieces = [...pieces];
-    shuffledPieces.sort(() => Math.random() - 0.5); // Random shuffle
+function shufflePieces() {
+    pieces.forEach(piece => {
+        const randomTop = Math.floor(Math.random() * (puzzleSize)) * 100;
+        const randomLeft = Math.floor(Math.random() * (puzzleSize)) * 100;
 
-    puzzleBoard.innerHTML = ''; // Clear the board
-
-    shuffledPieces.forEach(piece => puzzleBoard.appendChild(piece)); // Re-add shuffled pieces
-
-    // Reset status and solved count
-    solved = 0;
-    document.getElementById('status').textContent = 'Puzzle is shuffled. Start solving!';
+        piece.style.top = `${randomTop}px`;
+        piece.style.left = `${randomLeft}px`;
+        piece.setAttribute('data-pos', randomTop + "," + randomLeft); // Set initial random position
+    });
 }
 
 // Handle drag start
 function handleDragStart(e) {
-    e.dataTransfer.setData('text/plain', e.target.dataset.row + ',' + e.target.dataset.col);
+    e.dataTransfer.setData('piece', e.target.getAttribute('data-pos'));
 }
 
-// Handle drag over
+// Handle drag over (allow drop)
 function handleDragOver(e) {
-    e.preventDefault(); // Necessary to allow drop
+    e.preventDefault();
 }
 
 // Handle drop
 function handleDrop(e) {
     e.preventDefault();
-    const draggedData = e.dataTransfer.getData('text/plain');
-    const [draggedRow, draggedCol] = draggedData.split(',').map(Number);
-    const droppedRow = e.target.dataset.row;
-    const droppedCol = e.target.dataset.col;
 
-    if (draggedRow === droppedRow && draggedCol === droppedCol) return; // Prevent invalid drop
+    const draggedPiecePos = e.dataTransfer.getData('piece');
+    const draggedPiece = document.querySelector(`[data-pos="${draggedPiecePos}"]`);
 
-    const draggedPiece = document.querySelector(`.puzzle-piece[data-row="${draggedRow}"][data-col="${draggedCol}"]`);
-    const droppedPiece = document.querySelector(`.puzzle-piece[data-row="${droppedRow}"][data-col="${droppedCol}"]`);
+    const targetPiece = e.target;
 
-    // Swap the positions of the pieces
-    draggedPiece.dataset.row = droppedRow;
-    draggedPiece.dataset.col = droppedCol;
-    droppedPiece.dataset.row = draggedRow;
-    droppedPiece.dataset.col = draggedCol;
+    // Swap positions of the dragged piece and target piece
+    const draggedPiecePosArr = draggedPiecePos.split(',');
+    const targetPiecePosArr = targetPiece.getAttribute('data-pos').split(',');
 
-    // Check if the puzzle is solved
-    checkPuzzle();
+    draggedPiece.style.top = targetPiecePosArr[0] + 'px';
+    draggedPiece.style.left = targetPiecePosArr[1] + 'px';
+    targetPiece.style.top = draggedPiecePosArr[0] + 'px';
+    targetPiece.style.left = draggedPiecePosArr[1] + 'px';
+
+    draggedPiece.setAttribute('data-pos', targetPiecePosArr);
+    targetPiece.setAttribute('data-pos', draggedPiecePos);
 }
 
 // Check if the puzzle is solved
 function checkPuzzle() {
-    const correctPositions = pieces.filter(piece => {
-        const row = parseInt(piece.dataset.row, 10);
-        const col = parseInt(piece.dataset.col, 10);
-        return parseInt(piece.style.backgroundPosition.split(' ')[0].slice(1) / 100, 10) === col &&
-               parseInt(piece.style.backgroundPosition.split(' ')[1].slice(1) / 100, 10) === row;
+    const correctPos = pieces.every(piece => {
+        const row = piece.getAttribute('data-row');
+        const col = piece.getAttribute('data-col');
+        const pos = piece.getAttribute('data-pos').split(',');
+
+        return pos[0] === row * 100 && pos[1] === col * 100;
     });
 
-    if (correctPositions.length === pieces.length) {
-        solved++;
-        if (solved === 1) {
-            document.getElementById('status').textContent = 'You solved the puzzle!';
-            window.location.href = "birthdaybook.html"; // Ensure "puzzle.html" is correct relative path
-            return false; // Prevent form submission and page refresh
-        }
+    if (correctPos) {
+        setTimeout(() => {
+            alert('Puzzle Solved!');
+        }, 500);
     }
 }
 
-// Initialize the puzzle
-createPuzzlePieces();
-shufflePuzzle();
+// Reset puzzle
+function resetPuzzle() {
+    createPuzzle();
+}
+
+createPuzzle(); // Initialize puzzle on page load
