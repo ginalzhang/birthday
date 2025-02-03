@@ -1,27 +1,51 @@
 const puzzleContainer = document.getElementById('puzzleContainer');
-const imageSrc = 'file1.png'; // Replace with your image file path
-
-const puzzleSize = 4; // 4x4 puzzle, adjust as needed
+const imageSrc = 'images/your-image.jpg'; // Replace with your image file path
+const numRows = 4; // Number of rows in the puzzle
+const numCols = 4; // Number of columns in the puzzle
 
 let pieces = [];
+let imageWidth, imageHeight;
 
-// Function to create puzzle pieces from the image
-function createPuzzle() {
+// Function to load the image and get its dimensions
+function loadImage() {
+    const img = new Image();
+    img.src = imageSrc;
+
+    img.onload = () => {
+        imageWidth = img.width;
+        imageHeight = img.height;
+        createPuzzle(imageWidth, imageHeight);
+    };
+}
+
+// Function to create the puzzle
+function createPuzzle(width, height) {
     pieces = [];
     puzzleContainer.innerHTML = ''; // Clear the puzzle container
 
-    for (let row = 0; row < puzzleSize; row++) {
-        for (let col = 0; col < puzzleSize; col++) {
+    puzzleContainer.style.gridTemplateColumns = `repeat(${numCols}, 1fr)`;  // Set grid columns
+    puzzleContainer.style.gridTemplateRows = `repeat(${numRows}, 1fr)`;  // Set grid rows
+
+    const pieceWidth = width / numCols;
+    const pieceHeight = height / numRows;
+
+    for (let row = 0; row < numRows; row++) {
+        for (let col = 0; col < numCols; col++) {
             const piece = document.createElement('div');
             piece.classList.add('piece');
 
             // Set the background image for the piece (cut it into smaller pieces)
             piece.style.backgroundImage = `url(${imageSrc})`;
-            piece.style.backgroundPosition = `-${col * 100}px -${row * 100}px`; // Position the background image for each piece
+            piece.style.backgroundPosition = `-${col * pieceWidth}px -${row * pieceHeight}px`; // Position the background for each piece
+
             piece.setAttribute('data-row', row);
             piece.setAttribute('data-col', col);
 
-            // Make each piece draggable
+            // Set the size of each piece
+            piece.style.width = `${pieceWidth}px`;
+            piece.style.height = `${pieceHeight}px`;
+
+            // Make the piece draggable
             piece.setAttribute('draggable', true);
             piece.addEventListener('dragstart', handleDragStart);
             piece.addEventListener('dragover', handleDragOver);
@@ -34,15 +58,15 @@ function createPuzzle() {
         }
     }
 
-    // Shuffle the pieces by randomizing their position in the container
+    // Shuffle the pieces by randomizing their positions in the container
     shufflePieces();
 }
 
 // Shuffle the puzzle pieces
 function shufflePieces() {
     pieces.forEach(piece => {
-        const randomTop = Math.floor(Math.random() * (puzzleSize)) * 100;
-        const randomLeft = Math.floor(Math.random() * (puzzleSize)) * 100;
+        const randomTop = Math.floor(Math.random() * numRows) * (imageHeight / numRows);
+        const randomLeft = Math.floor(Math.random() * numCols) * (imageWidth / numCols);
 
         piece.style.top = `${randomTop}px`;
         piece.style.left = `${randomLeft}px`;
@@ -89,7 +113,7 @@ function checkPuzzle() {
         const col = piece.getAttribute('data-col');
         const pos = piece.getAttribute('data-pos').split(',');
 
-        return pos[0] === row * 100 && pos[1] === col * 100;
+        return pos[0] === row * (imageHeight / numRows) && pos[1] === col * (imageWidth / numCols);
     });
 
     if (correctPos) {
@@ -101,7 +125,7 @@ function checkPuzzle() {
 
 // Reset puzzle
 function resetPuzzle() {
-    createPuzzle();
+    loadImage(); // Re-load the image and reset the puzzle
 }
 
-createPuzzle(); // Initialize puzzle on page load
+loadImage(); // Initialize puzzle on page load
