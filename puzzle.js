@@ -1,5 +1,5 @@
 const puzzleContainer = document.getElementById('puzzleContainer');
-const imageSrc = 'images/your-image.jpg'; // Replace with your image file path
+const imageSrc = 'file1.png'; // Replace with your image file path
 const numRows = 4; // Number of rows in the puzzle
 const numCols = 4; // Number of columns in the puzzle
 
