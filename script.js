@@ -14,9 +14,9 @@ function validateForm() {
         errorMessage.textContent = "hint: the user is bdayboy and the pw is ur name!";
         return false;
     }
- alert("let the games begin.");
+ alert("welcome.");
 
     // Redirect to puzzle.html page upon successful login
-    window.location.href = "puzzle.html"; // Ensure "puzzle.html" is correct relative path
+    window.location.href = "birthdaybook.html"; // Ensure "puzzle.html" is correct relative path
     return false; // Prevent form submission and page refresh
 }
