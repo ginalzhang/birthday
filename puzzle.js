@@ -1,4 +1,4 @@
-const puzzleImage = 'puzzle-image.jpg'; // Path to your puzzle image
+const puzzleImage = 'file1.png'; // Path to your puzzle image
 const rows = 3; // Number of rows in the puzzle grid
 const cols = 3; // Number of columns in the puzzle grid
 const puzzleBoard = document.getElementById('puzzle-board');
